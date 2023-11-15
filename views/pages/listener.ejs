@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Listener Page</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<style>
+  .circle {
+    height: 125px;
+    width: 125px;
+    background-color: #FCCB09;
+    border-radius: 50%;
+    margin: 0 auto;
+    margin-top: 20px;
+}
+</style>
+
+<body>
+    <nav>
+      <div class="sidebar">
+         <img src="images/jimmypfp.png" style="width: 125px; height: 125px; margin-top: 15px; display: block; margin-left: auto; margin-right: auto;">
+         <div class="username">Jimmy</div>
+            <ul>
+              <li><a href="#">Home</a></li>
+              <li><a href="#">Now Playing</a></li>
+              <li><a href="#">Sample Text</a></li>
+              <li><final_a href="#">Sample Text</final_a></li>
+            </ul>
+          <img src="images/ig.webp" style="width: 40px; height: 40px; display: block; margin-left: auto; margin-right: auto; margin-top: 200px;" id = "igButton">
+          <script>
+            function goToInstagram() {
+            // Replace 'instagram_username' with the actual Instagram profile URL
+            const igLink = 'https://www.instagram.com/hiphopdipdop/';
+            
+            window.location.href = igLink;
+        }
+
+        const igIcon = document.getElementById('igButton');
+        igIcon.addEventListener('click', goToInstagram);
+    </script>
+          <figcaption style="color: rgba(252, 203, 9); text-align: center;">Follow us on IG</figcaption>
+      </div>
+    </nav>
+
+  <main class="content">
+    <section class="title">Now Playing</section>
+    <section class="subtitle">Playlist XYZ</section>
+    <div class="image-container">
+      <img src="images/moreinfo.png" alt="More Info" style="width: 29px; height: 29px;" onclick="alert('Viva La Vida is a song by British rock band Coldplay. It was written by all members of the band for their fourth album, Viva la Vida or Death and All His Friends (2008). The lyrics to the song contain historical and Christian references, and the track is built around a looping string section in unison with a digitally processed piano, with other layers gradually being added as the song builds.')">
+
+      <img src="images/save.webp" alt="Save" style="width: 29px; height: 29px;" onclick="saveSong()">
+
+      <script>
+        function saveSong() {
+            // Get the elements by their IDs
+            const songText1 = document.getElementById('saved1');
+
+            songText1.textContent = "Viva La Vida";
+        }
+      </script>
+
+      <img src="images/comment.png" alt="Comment" style="width: 29px; height: 29px;" onclick="promptUser()">
+
+      <script>
+        function promptUser() {
+
+          var input;
+          var errMsg = "";
+          var hasCommented = true
+          var i = 0;
+
+          do {
+
+            if(i++ > 0) {
+              errMsg = "Empty comment inputted! ";
+            }
+
+            input = prompt(errMsg + "Please leave a comment about this song."); 
+
+            if(input == null) {
+              hasCommented = false
+              break;
+            }
+          }
+          while(input.trim() === "")
+
+          if(hasCommented) {
+            alert("Thanks for your feedback!");
+          }
+        }
+      </script>
+    </div>
+    <div class="rectangle" style="position: relative;">
+      <audio controls style="position: absolute; bottom: 10px; left: 0;">
+      <source src="audio/viva.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+      </audio>
+    </div>
+    <section class="song_desc">Song: Viva La Vida</section>
+    <section class="song_desc">Artist: Coldplay</section>
+    <section class="song_desc" style="font-size: 24px;">Up Next</section>
+
+    <div style="display: flex; flex-direction: row; align-items: flex-start; background-color: rgba(252, 203, 9); border-style: solid; width: 400px; height: 87px; margin: 0 auto; margin-top: 20px; justify-content: center;">
+      <article>
+        <div style="width: 76px; height: 51px; background-color: rgba(252, 203, 9); margin: 10px; text-align: center; line-height: 75px; border-style: solid;"></div>
+        <p style="position: relative; margin-left: 22px; margin-top: 5px; font-size: 12px;">Song: Song</p>
+      </article>
+
+      <article>
+        <div style="width: 76px; height: 51px; background-color: rgba(252, 203, 9); margin: 10px; text-align: center; line-height: 75px; border-style: solid;"></div>
+        <p style="position: relative; margin-left: 22px; margin-top: 5px; font-size: 12px;">Song: Song</p>
+      </article>
+
+      <article>
+        <div style="width: 76px; height: 51px; background-color: rgba(252, 203, 9); margin: 10px; text-align: center; line-height: 75px; border-style: solid;"></div>
+        <p style="position: relative; margin-left: 22px; margin-top: 5px; font-size: 12px;">Song: Song</p>
+      </article>
+    </div>
+
+    <section class="song_desc" style="font-size: 24px;">Saved</section>
+
+    <div style="display: flex; flex-direction: row; align-items: flex-start; background-color: rgba(252, 203, 9); border-style: solid; width: 400px; height: 87px; margin: 0 auto; margin-top: 20px; justify-content: center;">
+      <article>
+        <div style="width: 76px; height: 51px; background-color: rgba(252, 203, 9); margin: 10px; text-align: center; line-height: 75px; border-style: solid; position: relative;"></div>
+        <p id="saved1" style="position: relative; margin-left: 22px; margin-top: 5px; font-size: 12px;">Song: Song</p>
+      </article>
+
+      <article>
+        <div style="width: 76px; height: 51px; background-color: rgba(252, 203, 9); margin: 10px; text-align: center; line-height: 75px; border-style: solid;"></div>
+        <p style="position: relative; margin-left: 22px; margin-top: 5px; font-size: 12px;">Song: Song</p>
+      </article>
+
+      <article>
+        <div style="width: 76px; height: 51px; background-color: rgba(252, 203, 9); margin: 10px; text-align: center; line-height: 75px; border-style: solid;"></div>
+        <p style="position: relative; margin-left: 22px; margin-top: 5px; font-size: 12px;">Song: Song</p>
+      </article>
+    </div>
+  </main>
+</body>
+</html>
