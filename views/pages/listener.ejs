@@ -21,7 +21,7 @@
     <nav>
       <div class="sidebar">
          <img src="images/jimmypfp.png" style="width: 125px; height: 125px; margin-top: 15px; display: block; margin-left: auto; margin-right: auto;">
-         <div class="username">Jimmy</div>
+         <div class="username"><%=username%></div>
             <ul>
               <li><a href="#">Home</a></li>
               <li><a href="#">Now Playing</a></li>
@@ -48,74 +48,158 @@
     <section class="title">Now Playing</section>
     <section class="subtitle">Playlist XYZ</section>
     <div class="image-container">
-      <img src="images/moreinfo.png" alt="More Info" style="width: 29px; height: 29px;" onclick="alert('Viva La Vida is a song by British rock band Coldplay. It was written by all members of the band for their fourth album, Viva la Vida or Death and All His Friends (2008). The lyrics to the song contain historical and Christian references, and the track is built around a looping string section in unison with a digitally processed piano, with other layers gradually being added as the song builds.')">
-
-      <img src="images/save.webp" alt="Save" style="width: 29px; height: 29px;" onclick="saveSong()">
+      <img src="images/moreinfo.png" alt="More Info" style="width: 29px; height: 29px;" onclick="displayMoreInfo()">
 
       <script>
-        function saveSong() {
-            // Get the elements by their IDs
-            const songText1 = document.getElementById('saved1');
-
-            songText1.textContent = "Viva La Vida";
+        function displayMoreInfo() {
+          const mi = '<%= songList.length > 0 ? songList[0].moreinfo : "''" %>';
+          alert(mi);
         }
       </script>
 
-      <img src="images/comment.png" alt="Comment" style="width: 29px; height: 29px;" onclick="promptUser()">
+      <img src="images/save.webp" alt="Save" style="width: 29px; height: 29px;" onclick="saveSong('<%= songList.length > 0 ? songList[0].title : '' %>')">
 
       <script>
-        function promptUser() {
 
-          var input;
-          var errMsg = "";
-          var hasCommented = true
-          var i = 0;
+        function saveSong(songName) {
 
-          do {
+          fetch('/saveSong', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ songTitle: songName }),
+          })
+          .then(response => response.json())
+          .then(data => {
+              console.log('Server Response:', data);
 
-            if(i++ > 0) {
-              errMsg = "Empty comment inputted! ";
-            }
+              if (data && data.success) {
+                  alert("Song saved successfully!");
+                  const firstSave = document.getElementById('saved1');
+                  firstSave.textContent = songName;
 
-            input = prompt(errMsg + "Please leave a comment about this song."); 
-
-            if(input == null) {
-              hasCommented = false
-              break;
-            }
-          }
-          while(input.trim() === "")
-
-          if(hasCommented) {
-            alert("Thanks for your feedback!");
-          }
+              } else {
+                  alert("Error saving song: " + (data ? data.message : 'Unknown error'));
+              }
+          })
+          .catch(error => {
+              console.error('Error:', error);
+              alert("Error saving song: " + error.message);
+          });
         }
       </script>
+
+      <img src="images/comment.png" alt="Comment" style="width: 29px; height: 29px;" onclick="submitComment()">
+
+      <script>
+        function submitComment() {
+            var input = prompt("Please leave a comment about this song.");
+
+            if (input !== null && input.trim() !== "") {
+                fetch('/insertComment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: input }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Server Response:', data); // Log the entire response
+
+                    if (data && data.success) {
+                        alert("Thanks for your feedback!");
+                    } else {
+                        alert("Error adding comment: " + (data ? data.message : 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert("Error adding comment: " + error.message);
+                });
+            } else {
+                alert("Empty comment inputted! Please leave a valid comment.");
+            }
+        }
+      </script>
+
+      <button onclick="promptUserForSong()">Add Custom Song</button>
+      <button>Reset</button>
+          <script>
+              function promptUserForSong() {
+                  const songTitle = prompt("Enter the title of the song:");
+                  const songArtist = prompt("Enter the artist of the song:");
+                  const songGenre = prompt("Enter the genre of the song:");
+                  const songDuration = prompt("Enter the duration of the song in seconds:");
+                  const songYear = prompt("Enter the year the song was released:");
+                  const songMoreInfo = prompt("Enter additional information about the song:");
+
+                  // Check if the user entered valid information
+                  if (songTitle && songArtist && songGenre && songDuration && songYear && songMoreInfo) {
+                      // Make a request to the server to add the custom song
+                      fetch('/addCustomSong', {
+                          method: 'POST',
+                          headers: {
+                              'Content-Type': 'application/json',
+                          },
+                          body: JSON.stringify({
+                              title: songTitle,
+                              artist: songArtist,
+                              genre: songGenre,
+                              duration: parseInt(songDuration),
+                              year: parseInt(songYear),
+                              moreinfo: songMoreInfo,
+                          }),
+                      })
+
+                      .then(response => response.json())
+                      .then(data => {
+                          console.log('Server Response:', data);
+
+                          if (data && data.success) {
+                              alert("Custom song added successfully!");
+                              const thirdSong = document.getElementById('thirdSong');
+                              thirdSong.textContent = songTitle;
+
+                          } else {
+                              alert("Error adding custom song: " + (data ? data.message : 'Unknown error'));
+                          }
+                      })
+                      .catch(error => {
+                          console.error('Error:', error);
+                          alert("Error adding custom song: " + error.message);
+                      });
+                  } else {
+                      alert("Invalid input! Please enter valid information for the custom song.");
+                  }
+              }
+          </script>
     </div>
     <div class="rectangle" style="position: relative;">
       <audio controls style="position: absolute; bottom: 10px; left: 0;">
-      <source src="audio/viva.mp3" type="audio/mpeg">
+      <source src="audio/chosen.mp3" type="audio/mpeg">
         Your browser does not support the audio element.
       </audio>
     </div>
-    <section class="song_desc">Song: Viva La Vida</section>
-    <section class="song_desc">Artist: Coldplay</section>
+    <section class="song_desc">Song: <%= songList.length > 0 ? songList[0].title : 'No song available' %></section>
+    <section class="song_desc">Artist: <%= songList.length > 0 ? songList[0].artist : 'No artist available' %></section>
     <section class="song_desc" style="font-size: 24px;">Up Next</section>
 
     <div style="display: flex; flex-direction: row; align-items: flex-start; background-color: rgba(252, 203, 9); border-style: solid; width: 400px; height: 87px; margin: 0 auto; margin-top: 20px; justify-content: center;">
       <article>
         <div style="width: 76px; height: 51px; background-color: rgba(252, 203, 9); margin: 10px; text-align: center; line-height: 75px; border-style: solid;"></div>
-        <p style="position: relative; margin-left: 22px; margin-top: 5px; font-size: 12px;">Song: Song</p>
+        <p style="position: relative; margin-left: 22px; margin-top: 5px; font-size: 12px;"> <%= songList.length > 1 ? songList[1].title : 'None' %></p>
       </article>
 
       <article>
         <div style="width: 76px; height: 51px; background-color: rgba(252, 203, 9); margin: 10px; text-align: center; line-height: 75px; border-style: solid;"></div>
-        <p style="position: relative; margin-left: 22px; margin-top: 5px; font-size: 12px;">Song: Song</p>
+        <p style="position: relative; margin-left: 22px; margin-top: 5px; font-size: 12px;"> <%= songList.length > 2 ? songList[2].title : 'None' %></p>
       </article>
 
       <article>
         <div style="width: 76px; height: 51px; background-color: rgba(252, 203, 9); margin: 10px; text-align: center; line-height: 75px; border-style: solid;"></div>
-        <p style="position: relative; margin-left: 22px; margin-top: 5px; font-size: 12px;">Song: Song</p>
+        <p id ="thirdSong" style="position: relative; margin-left: 22px; margin-top: 5px; font-size: 12px;"> <%= songList.length > 3 ? songList[3].title : 'None' %></p>
       </article>
     </div>
 
@@ -124,17 +208,17 @@
     <div style="display: flex; flex-direction: row; align-items: flex-start; background-color: rgba(252, 203, 9); border-style: solid; width: 400px; height: 87px; margin: 0 auto; margin-top: 20px; justify-content: center;">
       <article>
         <div style="width: 76px; height: 51px; background-color: rgba(252, 203, 9); margin: 10px; text-align: center; line-height: 75px; border-style: solid; position: relative;"></div>
-        <p id="saved1" style="position: relative; margin-left: 22px; margin-top: 5px; font-size: 12px;">Song: Song</p>
+        <p id="saved1" style="position: relative; margin-left: 22px; margin-top: 5px; font-size: 12px;"> <%=savedList.length > 0 ? savedList[0].songTitle : 'None'%> </p>
       </article>
 
       <article>
         <div style="width: 76px; height: 51px; background-color: rgba(252, 203, 9); margin: 10px; text-align: center; line-height: 75px; border-style: solid;"></div>
-        <p style="position: relative; margin-left: 22px; margin-top: 5px; font-size: 12px;">Song: Song</p>
+        <p style="position: relative; margin-left: 22px; margin-top: 5px; font-size: 12px;">None</p>
       </article>
 
       <article>
         <div style="width: 76px; height: 51px; background-color: rgba(252, 203, 9); margin: 10px; text-align: center; line-height: 75px; border-style: solid;"></div>
-        <p style="position: relative; margin-left: 22px; margin-top: 5px; font-size: 12px;">Song: Song</p>
+        <p style="position: relative; margin-left: 22px; margin-top: 5px; font-size: 12px;">None</p>
       </article>
     </div>
   </main>
