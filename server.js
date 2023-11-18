@@ -14,10 +14,10 @@ var saves = require('./models/saves.js');
 
 var db;
 var currSongs;
+var songNames;
 
 const uri = "mongodb+srv://blimaye:1fNhbEi1dERRufQP@cluster0.x5vrqdd.mongodb.net/song?retryWrites=true&w=majority";
 
-// set the view engine to ejs
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
 app.listen(8080);
@@ -31,6 +31,7 @@ const start = async() => {
         console.log('App listening on port 8080');
 
         var currSongs = await songInfos.find({});
+        songNames = ['Chosen', 'Nonstop', 'SOTOTW'];
 
         if(currSongs.length == 0) {
             const songs = [ { title: 'Chosen', artist: 'Blxst', genre: 'Hip-Hop', duration: 162, year: 2020, moreinfo: 'Chosen is a song by American rapper Blxst, featuring American singer Ty Dolla Sign and fellow American rapper Tyga. It was released as a single from the deluxe version of Blxst debut EP No Love Lost on December 4, 2020, through Red Bull Records and Evgle.'},
@@ -98,16 +99,13 @@ app.post('/saveSong', async (req, res) => {
     try {
         const { songTitle } = req.body;
 
-        // Find the song by its name
         const ssong = await songInfos.findOne({ title: songTitle });
 
         if (ssong) {
-            // Assuming you have a SavedSong model/schema
             const savedSong = new saves({
                 songTitle: ssong.title,
             });
 
-            // Save the saved song to the database
             await savedSong.save();
 
             res.json({ success: true, message: 'Song saved successfully' });
@@ -124,7 +122,6 @@ app.post('/addCustomSong', async (req, res) => {
     try {
         const { title, artist, genre, duration, year, moreinfo } = req.body;
 
-        // Assuming you have a Song model/schema
         const customSong = new songInfos({ title: title, artist: artist, genre: genre, duration: duration, year: year, moreinfo: moreinfo });
         await customSong.save();
 
@@ -133,6 +130,23 @@ app.post('/addCustomSong', async (req, res) => {
         console.error('Error:', error);
         res.status(500).json({ success: false, error: error.message });
     }
+});
+
+app.post('/resetData', async (req, res) => {
+
+    const savesCollection = mongoose.connection.collections['saves'];
+
+    if(savesCollection) {
+        await savesCollection.deleteMany({});
+    }
+
+    const songInfosCollection = mongoose.connection.collections['songinfos'];
+
+    if (songInfosCollection) {
+        await songInfosCollection.deleteMany({ title: { $nin: songNames } });
+    }
+
+    res.json({ success: true });
 });
 
 

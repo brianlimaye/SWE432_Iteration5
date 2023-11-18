@@ -31,7 +31,6 @@
           <img src="images/ig.webp" style="width: 40px; height: 40px; display: block; margin-left: auto; margin-right: auto; margin-top: 200px;" id = "igButton">
           <script>
             function goToInstagram() {
-            // Replace 'instagram_username' with the actual Instagram profile URL
             const igLink = 'https://www.instagram.com/hiphopdipdop/';
             
             window.location.href = igLink;
@@ -125,8 +124,41 @@
       </script>
 
       <button onclick="promptUserForSong()">Add Custom Song</button>
-      <button>Reset</button>
+      <button onclick="resetData()">Reset</button>
           <script>
+
+              function resetData() {
+                  const confirmation = confirm("Are you sure you want to reset? This will clear all the songs you added and saved.");
+                  
+                  if (confirmation) {
+                      fetch('/resetData', {
+                          method: 'POST',
+                          headers: {
+                              'Content-Type': 'application/json',
+                          },
+                      })
+                      .then(response => response.json())
+                      .then(data => {
+                          console.log('Server Response:', data);
+
+                          if (data && data.success) {
+                              alert("Data reset successfully!");
+                              const firstSave = document.getElementById('saved1');
+                              const thirdSong = document.getElementById('thirdSong');
+
+                              firstSave.textContent = 'None';
+                              thirdSong.textContent = 'None';
+                          } else {
+                              alert("Error resetting data: " + (data ? data.message : 'Unknown error'));
+                          }
+                      })
+                      .catch(error => {
+                          console.error('Error:', error);
+                          alert("Error resetting data: " + error.message);
+                      });
+                  }
+              }
+
               function promptUserForSong() {
                   const songTitle = prompt("Enter the title of the song:");
                   const songArtist = prompt("Enter the artist of the song:");
@@ -135,9 +167,7 @@
                   const songYear = prompt("Enter the year the song was released:");
                   const songMoreInfo = prompt("Enter additional information about the song:");
 
-                  // Check if the user entered valid information
                   if (songTitle && songArtist && songGenre && songDuration && songYear && songMoreInfo) {
-                      // Make a request to the server to add the custom song
                       fetch('/addCustomSong', {
                           method: 'POST',
                           headers: {
